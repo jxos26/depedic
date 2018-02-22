@@ -1,0 +1,122 @@
+<?php
+  
+  include ("config.php");
+  $logout=false;
+  $errorLogin=false;
+  $notPermitted=false;
+  $inactive=false;
+  $errorEmail=false;
+  $errorPhone=false;
+  $successReg = false;
+
+  //logout code
+    if (isset($_GET['logout'])) {
+     session_start();         
+     session_destroy();   
+     $_SESSION = array();
+     $logout=true;
+    }
+
+  //not permitted code
+    if (isset($_GET['notPermitted'])) {
+     session_start();         
+     session_destroy();   
+     $_SESSION = array();
+     $notPermitted=true;
+    }
+
+  //idle code
+    if (isset($_GET['inactive'])) {
+     session_start();         
+     session_destroy();   
+     $_SESSION = array();
+     $inactive=true;
+    }
+
+  //login code
+  if (isset($_POST['login'])) {
+    $uname=trim($_POST['username']);
+    $pword=md5(trim($_POST['password']));
+    
+    $con = con();//connect to DB
+    $res=mysqli_query($con,"SELECT * FROM user WHERE username = '$uname' AND password = '$pword';");
+    //echo"SELECT * FROM user WHERE uname = '$uname' AND pword = '$pword';";
+    if(mysqli_num_rows($res) > 0){
+      $user = mysqli_fetch_array($res);
+      session_start();
+      $_SESSION['id'] = $user[0];
+      $_SESSION['fname'] = $user[3];
+      $_SESSION['lname'] = $user[5];
+      $_SESSION['user_type'] =  $user[10];
+      $_SESSION['position'] =  $user[6];
+      $_SESSION['LAST_ACTIVITY'] = time();
+      header("Location: requests.php");
+      if($_SESSION['user_type']==2){
+        header("Location: myRequests.php");
+        }
+      exit; 
+    }
+    else{
+      $errorLogin=true;
+    }
+    discon($con);//disconnect to DB
+  }
+  
+  
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>SB Admin - Start Bootstrap Template</title>
+  <!-- Bootstrap core CSS-->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom fonts for this template-->
+  <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <!-- Custom styles for this template-->
+  <link href="css/sb-admin.css" rel="stylesheet">
+</head>
+
+<body class="bg-dark">
+  <div class="container">
+    <div class="card card-login mx-auto mt-5">
+      <div class="card-header">Login</div>
+      <div class="card-body">
+        <form>
+          <div class="form-group">
+            <label for="exampleInputEmail1">Email address</label>
+            <input class="form-control" id="exampleInputEmail1" type="email" aria-describedby="emailHelp" placeholder="Enter email">
+          </div>
+          <div class="form-group">
+            <label for="exampleInputPassword1">Password</label>
+            <input class="form-control" id="exampleInputPassword1" type="password" placeholder="Password">
+          </div>
+          <div class="form-group">
+            <div class="form-check">
+              <label class="form-check-label">
+                <input class="form-check-input" type="checkbox"> Remember Password</label>
+            </div>
+          </div>
+          <a class="btn btn-primary btn-block" href="index.html">Login</a>
+        </form>
+        <div class="text-center">
+          <a class="d-block small mt-3" href="register.html">Register an Account</a>
+          <a class="d-block small" href="forgot-password.html">Forgot Password?</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Bootstrap core JavaScript-->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- Core plugin JavaScript-->
+  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+</body>
+
+</html>
